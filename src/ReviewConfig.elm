@@ -46,6 +46,8 @@ import Simplify
 import UseCamelCase
 
 
+{-| `elm-review` config
+-}
 config : List Rule
 config =
     [ -- Check cognitive complexity (branching, not branches) of code
