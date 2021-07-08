@@ -1,0 +1,8 @@
+{
+  "name": "elm-review-rules",
+  "version": "1.0.0",
+  "description": "My personal elm-review config for all Elm projects.",
+  "devDependencies": {
+    "elm-format": "^0.8.5"
+  }
+}

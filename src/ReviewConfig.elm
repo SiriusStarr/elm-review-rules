@@ -1,0 +1,197 @@
+module ReviewConfig exposing (config)
+
+import CognitiveComplexity
+import Documentation.ReadmeLinksPointToCurrentVersion
+import NoBooleanCase
+import NoDebug.Log
+import NoDebug.TodoOrToString
+import NoDuplicatePorts
+import NoEmptyText
+import NoExposingEverything
+import NoFloatIds
+import NoImportingEverything
+import NoInconsistentAliases
+import NoIndirectInternal
+import NoInvalidRGBValues
+import NoLeftPizza
+import NoLongImportLines
+import NoMissingDocumentation
+import NoMissingSubscriptionsCall
+import NoMissingTypeAnnotation
+import NoMissingTypeAnnotationInLetIn
+import NoMissingTypeConstructor
+import NoMissingTypeExpose
+import NoModuleOnExposedNames
+import NoRecursiveUpdate
+import NoRedundantConcat
+import NoRedundantCons
+import NoTypeAliasConstructorCall
+import NoUnmatchedUnit
+import NoUnoptimizedRecursion
+import NoUnsafePorts
+import NoUnsortedConstructors
+import NoUnsortedRecordFields
+import NoUnused.CustomTypeConstructorArgs
+import NoUnused.CustomTypeConstructors
+import NoUnused.Dependencies
+import NoUnused.Exports
+import NoUnused.Modules
+import NoUnused.Parameters
+import NoUnused.Patterns
+import NoUnused.Variables
+import NoUnusedPorts
+import NoUselessSubscriptions
+import Review.Rule exposing (Rule)
+import Simplify
+import UseCamelCase
+
+
+config : List Rule
+config =
+    [ -- Check cognitive complexity (branching, not branches) of code
+      CognitiveComplexity.rule 15
+
+    -- Reports links in the README.md that point to this project's package documentation on https://package.elm-lang.org/, where the version is set to latest or a different version than the current version of the package.
+    , Documentation.ReadmeLinksPointToCurrentVersion.rule
+
+    -- Disallow pattern matching on boolean values.
+    , NoBooleanCase.rule
+
+    -- Forbid `Debug.log`
+    , NoDebug.Log.rule
+
+    -- Forbid `Debug.todo` and `Debug.toString`
+    , NoDebug.TodoOrToString.rule
+
+    -- Ensure port names are unique within a project
+    , NoDuplicatePorts.rule
+
+    -- Forbid `Html.text ""` instead of `HtmlX.nothing`
+    , NoEmptyText.rule
+
+    -- Forbid `module A exposing (..)`
+    , NoExposingEverything.rule
+
+    -- Detect use of `Float`s as ids
+    , NoFloatIds.rule
+
+    -- Forbid `import A exposing (..)`
+    , NoImportingEverything.rule []
+
+    -- Ensure consistent import aliases and enforce their use
+    , NoInconsistentAliases.config
+        [ ( "Array.Extra", "ArrayX" )
+        , ( "Html.Attributes", "Attr" )
+        , ( "Html.Extra", "HtmlX" )
+        , ( "Json.Decode", "Decode" )
+        , ( "Json.Decode.Ancillary", "DecodeA" )
+        , ( "Json.Decode.Extra", "DecodeX" )
+        , ( "Json.Encode", "Encode" )
+        , ( "Json.Encode.Extra", "EncodeX" )
+        , ( "List.Extra", "ListX" )
+        , ( "List.Nonempty", "NE" )
+        , ( "List.Nonempty.Ancillary", "NEA" )
+        , ( "Maybe.Extra", "MaybeX" )
+        , ( "Random.Extra", "RandomX" )
+        , ( "Result.Extra", "ResultX" )
+        , ( "Svg.Attributes", "SvgAttr" )
+        ]
+        |> NoInconsistentAliases.noMissingAliases
+        |> NoInconsistentAliases.rule
+    , -- Disallow modules from importing Internal modules ouside of their own
+      NoIndirectInternal.rule
+
+    -- Make sure rgb and rgb255 arguments are within the ranges [0, 1] and [0, 255] respectively.
+    , NoInvalidRGBValues.rule
+
+    -- Disallow unnecessary function application operators, e.g. `a <| b`
+    , NoLeftPizza.rule NoLeftPizza.Redundant
+
+    -- Forbid import lines longer than 120 characters
+    , NoLongImportLines.rule
+
+    -- Make sure that every TLD is documented
+    , NoMissingDocumentation.rule
+
+    -- Reports likely missing calls to a `subscriptions` function.
+    , NoMissingSubscriptionsCall.rule
+
+    -- Forbid missing type annotations for TLDs
+    , NoMissingTypeAnnotation.rule
+
+    -- Forbid missing type annotations in let expressions
+    , NoMissingTypeAnnotationInLetIn.rule
+
+    -- Report missing constructors for lists of all constructors, e.g. `Color = Red | Blue | Green` will error with `[Red, Blue]`
+    , NoMissingTypeConstructor.rule
+
+    -- Forbid not exposing the type for any types that appear in exported functions or values
+    , NoMissingTypeExpose.rule
+
+    -- Disallow qualified use of names imported unqualified
+    , NoModuleOnExposedNames.rule
+
+    -- Forbid calling `update` within `update`
+    , NoRecursiveUpdate.rule
+
+    -- Warn about unnecessary `++`'s, e.g. `[a] ++ [b]` instead of `[a, b]`
+    , NoRedundantConcat.rule
+
+    -- Forbids consing to a literal list, e.g. `foo::[bar]` instead of `[foo,bar]`
+    , NoRedundantCons.rule
+
+    -- Forbid use of type alias constructors except with Json.Decode.map
+    , NoTypeAliasConstructorCall.rule
+
+    -- Disallow matching `()` with `_`
+    , NoUnmatchedUnit.rule
+
+    -- Disallow ports that do not use JSON (preventing run-time errors)
+    , NoUnsafePorts.rule NoUnsafePorts.any
+
+    -- Forbid recursion without TCO
+    , NoUnoptimizedRecursion.optOutWithComment "IGNORE TCO"
+        |> NoUnoptimizedRecursion.rule
+
+    -- Report unused custom type constructors
+    , NoUnused.CustomTypeConstructors.rule []
+
+    -- Report unused custom type fields
+    , NoUnused.CustomTypeConstructorArgs.rule
+
+    -- Report unused dependencies
+    , NoUnused.Dependencies.rule
+
+    -- Report exports never used in other modules
+    , NoUnused.Exports.rule
+
+    -- Report modules never used (or exported in the package)
+    , NoUnused.Modules.rule
+
+    -- Report unused function parameters
+    , NoUnused.Parameters.rule
+
+    -- Report unused parameters in pattern matching
+    , NoUnused.Patterns.rule
+
+    -- Report variables that are declared but never used
+    , NoUnused.Variables.rule
+
+    -- Ensure all ports are used
+    , NoUnusedPorts.rule
+
+    -- Reports `subscriptions` functions that never return a subscription.
+    , NoUselessSubscriptions.rule
+
+    -- Enforce alphabetic order of constructors
+    , NoUnsortedConstructors.rule
+
+    -- Enforce alphabetic order of record fields
+    , NoUnsortedRecordFields.rule
+
+    -- Detect simplifiable expressions, e.g. `a == True` can be simplified to `a`
+    , Simplify.rule Simplify.defaults
+
+    -- Enforce naming in camelCase and PascalCase
+    , UseCamelCase.rule UseCamelCase.default
+    ]
