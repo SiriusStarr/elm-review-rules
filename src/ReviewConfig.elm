@@ -11,7 +11,6 @@ import NoExposingEverything
 import NoFloatIds
 import NoImportingEverything
 import NoInconsistentAliases
-import NoIndirectInternal
 import NoInvalidRGBValues
 import NoLeftPizza
 import NoLongImportLines
@@ -100,8 +99,6 @@ config =
         ]
         |> NoInconsistentAliases.noMissingAliases
         |> NoInconsistentAliases.rule
-    , -- Disallow modules from importing Internal modules ouside of their own
-      NoIndirectInternal.rule
 
     -- Make sure rgb and rgb255 arguments are within the ranges [0, 1] and [0, 255] respectively.
     , NoInvalidRGBValues.rule
