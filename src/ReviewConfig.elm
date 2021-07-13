@@ -24,6 +24,7 @@ import NoModuleOnExposedNames
 import NoRecursiveUpdate
 import NoRedundantConcat
 import NoRedundantCons
+import NoSinglePatternCase
 import NoTypeAliasConstructorCall
 import NoUnmatchedUnit
 import NoUnoptimizedRecursion
@@ -138,6 +139,9 @@ config =
 
     -- Forbids consing to a literal list, e.g. `foo::[bar]` instead of `[foo,bar]`
     , NoRedundantCons.rule
+
+    -- Forbid unnecessary/overly verbose `case` blocks
+    , NoSinglePatternCase.rule
 
     -- Forbid use of type alias constructors except with Json.Decode.map
     , NoTypeAliasConstructorCall.rule
