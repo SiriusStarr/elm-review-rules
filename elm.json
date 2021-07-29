@@ -11,7 +11,7 @@
             "SiriusStarr/elm-review-no-single-pattern-case": "1.0.1",
             "elm/core": "1.0.5",
             "folq/review-rgb-ranges": "1.0.5",
-            "fysiweb/elm-review-sorted": "1.0.2",
+            "fysiweb/elm-review-sorted": "1.0.3",
             "jfmengels/elm-review": "2.5.0",
             "jfmengels/elm-review-cognitive-complexity": "1.0.0",
             "jfmengels/elm-review-common": "1.0.4",
