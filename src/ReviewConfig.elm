@@ -21,9 +21,11 @@ import NoMissingTypeAnnotationInLetIn
 import NoMissingTypeConstructor
 import NoMissingTypeExpose
 import NoModuleOnExposedNames
+import NoPrematureLetComputation
 import NoRecursiveUpdate
 import NoRedundantConcat
 import NoRedundantCons
+import NoSimpleLetBody
 import NoSinglePatternCase
 import NoTypeAliasConstructorCall
 import NoUnmatchedUnit
@@ -131,6 +133,9 @@ config =
     -- Disallow qualified use of names imported unqualified
     , NoModuleOnExposedNames.rule
 
+    -- Forbid let declarations that are computed earlier than needed
+    , NoPrematureLetComputation.rule
+
     -- Forbid calling `update` within `update`
     , NoRecursiveUpdate.rule
 
@@ -139,6 +144,9 @@ config =
 
     -- Forbids consing to a literal list, e.g. `foo::[bar]` instead of `[foo,bar]`
     , NoRedundantCons.rule
+
+    -- Forbid `let a = 5 in`
+    , NoSimpleLetBody.rule
 
     -- Forbid unnecessary/overly verbose `case` blocks
     , NoSinglePatternCase.rule
