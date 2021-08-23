@@ -149,7 +149,7 @@ config =
     , NoSimpleLetBody.rule
 
     -- Forbid unnecessary/overly verbose `case` blocks
-    , NoSinglePatternCase.rule
+    , NoSinglePatternCase.rule NoSinglePatternCase.fixInArgument
 
     -- Forbid use of type alias constructors except with Json.Decode.map
     , NoTypeAliasConstructorCall.rule
