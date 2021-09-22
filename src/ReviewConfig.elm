@@ -1,7 +1,10 @@
 module ReviewConfig exposing (config)
 
 import CognitiveComplexity
-import Documentation.ReadmeLinksPointToCurrentVersion
+import Docs.NoMissing exposing (allModules, everything)
+import Docs.ReviewAtDocs
+import Docs.ReviewLinksAndSections
+import Docs.UpToDateReadmeLinks
 import NoBooleanCase
 import NoDebug.Log
 import NoDebug.TodoOrToString
@@ -14,7 +17,6 @@ import NoInconsistentAliases
 import NoInvalidRGBValues
 import NoLeftPizza
 import NoLongImportLines
-import NoMissingDocumentation
 import NoMissingSubscriptionsCall
 import NoMissingTypeAnnotation
 import NoMissingTypeAnnotationInLetIn
@@ -43,7 +45,7 @@ import NoUnused.Patterns
 import NoUnused.Variables
 import NoUnusedPorts
 import NoUselessSubscriptions
-import Review.Rule exposing (Rule)
+import Review.Rule as Rule exposing (Rule)
 import Simplify
 import UseCamelCase
 
@@ -55,8 +57,21 @@ config =
     [ -- Check cognitive complexity (branching, not branches) of code
       CognitiveComplexity.rule 15
 
+    -- Make sure that every TLD is documented
+    , Docs.NoMissing.rule
+        { document = everything
+        , from = allModules
+        }
+        |> Rule.ignoreErrorsForDirectories [ "tests" ]
+
+    -- Ensure links in documentation are not broken or malformed
+    , Docs.ReviewLinksAndSections.rule
+
+    -- Ensure `@docs` doesn't appear malformed or where it doesn't belong
+    , Docs.ReviewAtDocs.rule
+
     -- Reports links in the README.md that point to this project's package documentation on https://package.elm-lang.org/, where the version is set to latest or a different version than the current version of the package.
-    , Documentation.ReadmeLinksPointToCurrentVersion.rule
+    , Docs.UpToDateReadmeLinks.rule
 
     -- Disallow pattern matching on boolean values.
     , NoBooleanCase.rule
@@ -111,9 +126,6 @@ config =
 
     -- Forbid import lines longer than 120 characters
     , NoLongImportLines.rule
-
-    -- Make sure that every TLD is documented
-    , NoMissingDocumentation.rule
 
     -- Reports likely missing calls to a `subscriptions` function.
     , NoMissingSubscriptionsCall.rule
