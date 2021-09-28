@@ -33,8 +33,10 @@ import NoTypeAliasConstructorCall
 import NoUnmatchedUnit
 import NoUnoptimizedRecursion
 import NoUnsafePorts
-import NoUnsortedConstructors
-import NoUnsortedRecordFields
+import NoUnsortedCases
+import NoUnsortedLetDeclarations
+import NoUnsortedRecords
+import NoUnsortedTopLevelDeclarations
 import NoUnused.CustomTypeConstructorArgs
 import NoUnused.CustomTypeConstructors
 import NoUnused.Dependencies
@@ -46,6 +48,9 @@ import NoUnused.Variables
 import NoUnusedPorts
 import NoUselessSubscriptions
 import Review.Rule as Rule exposing (Rule)
+import ReviewPipelineStyles exposing (andCallThem, andTryToFixThemBy, exceptThoseThat, forbid, leftCompositionPipelines, leftPizzaPipelines, parentheticalApplicationPipelines, rightCompositionPipelines, rightPizzaPipelines, that)
+import ReviewPipelineStyles.Fixes exposing (convertingToLeftComposition, convertingToLeftPizza, convertingToRightComposition, convertingToRightPizza, eliminatingInputStep, makingMultiline, makingSingleLine)
+import ReviewPipelineStyles.Predicates exposing (aDataStructure, aFlowControlStructure, aLambdaFunction, aLetBlock, and, doNot, haveAParentNotSeparatedBy, haveASimpleInputStep, haveFewerStepsThan, haveMoreStepsThan, separateATestFromItsLambda, spanMultipleLines)
 import Simplify
 import UseCamelCase
 
@@ -206,11 +211,118 @@ config =
     -- Reports `subscriptions` functions that never return a subscription.
     , NoUselessSubscriptions.rule
 
-    -- Enforce alphabetic order of constructors
-    , NoUnsortedConstructors.rule
+    -- Enforce ordering of case patterns
+    , NoUnsortedCases.rule
+        (NoUnsortedCases.defaults
+            |> NoUnsortedCases.sortListPatternsByLength
+        )
 
-    -- Enforce alphabetic order of record fields
-    , NoUnsortedRecordFields.rule
+    -- Enforce ordering of let declarations
+    , NoUnsortedLetDeclarations.rule
+        (NoUnsortedLetDeclarations.sortLetDeclarations
+            |> NoUnsortedLetDeclarations.usedInExpressionFirst
+            |> NoUnsortedLetDeclarations.alphabetically
+            |> NoUnsortedLetDeclarations.glueHelpersAfter
+        )
+
+    -- Enforce ordering of record fields
+    , NoUnsortedRecords.rule
+        (NoUnsortedRecords.defaults
+            |> NoUnsortedRecords.reportAmbiguousRecordsWithoutFix
+        )
+
+    -- Enforce ordering of TLDs
+    , NoUnsortedTopLevelDeclarations.rule
+        (NoUnsortedTopLevelDeclarations.sortTopLevelDeclarations
+            |> NoUnsortedTopLevelDeclarations.portsFirst
+            |> NoUnsortedTopLevelDeclarations.exposedOrderWithPrivateLast
+            |> NoUnsortedTopLevelDeclarations.typesFirst
+            |> NoUnsortedTopLevelDeclarations.alphabetically
+            |> NoUnsortedTopLevelDeclarations.glueHelpersAfter
+        )
+
+    -- Enforce pipeline style guidelines
+    , ReviewPipelineStyles.rule
+        [ -- <| should not be multiline except in tests
+          forbid leftPizzaPipelines
+            |> that
+                (spanMultipleLines
+                    |> and (haveMoreStepsThan 1)
+                )
+            |> andTryToFixThemBy convertingToRightPizza
+            |> andCallThem "multiline <| pipeline with several steps"
+        , forbid leftPizzaPipelines
+            |> that
+                (spanMultipleLines
+                    |> and (haveFewerStepsThan 2)
+                )
+            |> exceptThoseThat separateATestFromItsLambda
+            |> andTryToFixThemBy makingSingleLine
+            |> andCallThem "multiline <| pipeline with one step"
+
+        -- << should not be multiline
+        , forbid leftCompositionPipelines
+            |> that
+                (spanMultipleLines
+                    |> and (haveMoreStepsThan 1)
+                )
+            |> andTryToFixThemBy convertingToRightComposition
+            |> andCallThem "multiline << pipeline with several steps"
+        , forbid leftCompositionPipelines
+            |> that
+                (spanMultipleLines
+                    |> and (haveFewerStepsThan 2)
+                )
+            |> andTryToFixThemBy makingSingleLine
+            |> andCallThem "multiline << pipeline with one step"
+
+        -- >> should never be one step
+        , forbid rightCompositionPipelines
+            |> that (haveFewerStepsThan 2)
+            |> andTryToFixThemBy convertingToLeftComposition
+            |> andCallThem ">> pipeline with only 1 step"
+
+        -- |> should never be one step
+        , forbid rightPizzaPipelines
+            |> that (haveFewerStepsThan 2)
+            |> andTryToFixThemBy convertingToLeftPizza
+            |> andCallThem "|> pipeline with only 1 step"
+
+        -- >> should only be multiline
+        , forbid rightCompositionPipelines
+            |> that (doNot spanMultipleLines)
+            |> andTryToFixThemBy makingMultiline
+            |> andCallThem "single line >> pipeline"
+
+        -- |> should only be multiline
+        , forbid rightPizzaPipelines
+            |> that (doNot spanMultipleLines)
+            |> andTryToFixThemBy makingMultiline
+            |> andCallThem "single line |> pipeline"
+
+        -- |> should never have an input like `a |> b |> c` vs `b a |> c`
+        , forbid rightPizzaPipelines
+            |> that haveASimpleInputStep
+            |> andTryToFixThemBy eliminatingInputStep
+            |> andCallThem "|> pipeline with simple input"
+
+        -- <| should never have an unnecessary input like `a <| b <| c` vs `a <| b c`
+        , forbid leftPizzaPipelines
+            |> that haveASimpleInputStep
+            |> andTryToFixThemBy eliminatingInputStep
+            |> andCallThem "<| pipeline with simple input"
+
+        -- <| should never appear in the middle of a pipeline unless it is separated clearly
+        , forbid leftPizzaPipelines
+            |> that (haveAParentNotSeparatedBy [ aLambdaFunction, aFlowControlStructure, aDataStructure, aLetBlock ])
+            |> andCallThem "<| pipeline with immediate parent"
+
+        -- Parenthetical application should never be nested more than once
+        , forbid parentheticalApplicationPipelines
+            |> that (haveMoreStepsThan 1)
+            |> andTryToFixThemBy convertingToRightPizza
+            |> andCallThem "parenthetical application with several steps"
+        ]
 
     -- Detect simplifiable expressions, e.g. `a == True` can be simplified to `a`
     , Simplify.rule Simplify.defaults
