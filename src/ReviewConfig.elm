@@ -48,9 +48,10 @@ import NoUnused.Variables
 import NoUnusedPorts
 import NoUselessSubscriptions
 import Review.Rule as Rule exposing (Rule)
-import ReviewPipelineStyles exposing (andCallThem, andTryToFixThemBy, exceptThoseThat, forbid, leftCompositionPipelines, leftPizzaPipelines, parentheticalApplicationPipelines, rightCompositionPipelines, rightPizzaPipelines, that)
-import ReviewPipelineStyles.Fixes exposing (convertingToLeftComposition, convertingToLeftPizza, convertingToRightComposition, convertingToRightPizza, eliminatingInputStep, makingMultiline, makingSingleLine)
-import ReviewPipelineStyles.Predicates exposing (aDataStructure, aFlowControlStructure, aLambdaFunction, aLetBlock, and, doNot, haveAParentNotSeparatedBy, haveASimpleInputStep, haveFewerStepsThan, haveMoreStepsThan, separateATestFromItsLambda, spanMultipleLines)
+import ReviewPipelineStyles exposing (andCallThem, andTryToFixThemBy, exceptThoseThat, forbid, leftPizzaPipelines, rightCompositionPipelines, rightPizzaPipelines, that)
+import ReviewPipelineStyles.Fixes exposing (convertingToLeftComposition, convertingToLeftPizza)
+import ReviewPipelineStyles.Predicates exposing (aDataStructure, aFlowControlStructure, aLambdaFunction, aLetBlock, aSemanticallyInfixFunction, haveAParentNotSeparatedBy, haveASecondStepThatIs, haveFewerStepsThan)
+import ReviewPipelineStyles.Premade as PremadePipelineRule
 import Simplify
 import UseCamelCase
 
@@ -242,87 +243,55 @@ config =
         )
 
     -- Enforce pipeline style guidelines
-    , ReviewPipelineStyles.rule
+    , List.concat
         [ -- <| should not be multiline except in tests
-          forbid leftPizzaPipelines
-            |> that
-                (spanMultipleLines
-                    |> and (haveMoreStepsThan 1)
-                )
-            |> andTryToFixThemBy convertingToRightPizza
-            |> andCallThem "multiline <| pipeline with several steps"
-        , forbid leftPizzaPipelines
-            |> that
-                (spanMultipleLines
-                    |> and (haveFewerStepsThan 2)
-                )
-            |> exceptThoseThat separateATestFromItsLambda
-            |> andTryToFixThemBy makingSingleLine
-            |> andCallThem "multiline <| pipeline with one step"
+          PremadePipelineRule.noMultilineLeftPizza
 
         -- << should not be multiline
-        , forbid leftCompositionPipelines
-            |> that
-                (spanMultipleLines
-                    |> and (haveMoreStepsThan 1)
-                )
-            |> andTryToFixThemBy convertingToRightComposition
-            |> andCallThem "multiline << pipeline with several steps"
-        , forbid leftCompositionPipelines
-            |> that
-                (spanMultipleLines
-                    |> and (haveFewerStepsThan 2)
-                )
-            |> andTryToFixThemBy makingSingleLine
-            |> andCallThem "multiline << pipeline with one step"
+        , PremadePipelineRule.noMultilineLeftComposition
 
         -- >> should never be one step
-        , forbid rightCompositionPipelines
-            |> that (haveFewerStepsThan 2)
-            |> andTryToFixThemBy convertingToLeftComposition
-            |> andCallThem ">> pipeline with only 1 step"
+        , [ forbid rightCompositionPipelines
+                |> that (haveFewerStepsThan 2)
+                |> exceptThoseThat (haveASecondStepThatIs aSemanticallyInfixFunction)
+                |> andTryToFixThemBy convertingToLeftComposition
+                |> andCallThem ">> pipeline with only 1 step"
+          ]
 
         -- |> should never be one step
-        , forbid rightPizzaPipelines
-            |> that (haveFewerStepsThan 2)
-            |> andTryToFixThemBy convertingToLeftPizza
-            |> andCallThem "|> pipeline with only 1 step"
+        , [ forbid rightPizzaPipelines
+                |> that (haveFewerStepsThan 2)
+                |> exceptThoseThat (haveASecondStepThatIs aSemanticallyInfixFunction)
+                |> andTryToFixThemBy convertingToLeftPizza
+                |> andCallThem "|> pipeline with only 1 step"
+          ]
 
         -- >> should only be multiline
-        , forbid rightCompositionPipelines
-            |> that (doNot spanMultipleLines)
-            |> andTryToFixThemBy makingMultiline
-            |> andCallThem "single line >> pipeline"
+        , PremadePipelineRule.noSingleLineRightComposition
 
         -- |> should only be multiline
-        , forbid rightPizzaPipelines
-            |> that (doNot spanMultipleLines)
-            |> andTryToFixThemBy makingMultiline
-            |> andCallThem "single line |> pipeline"
+        , PremadePipelineRule.noSingleLineRightPizza
 
         -- |> should never have an input like `a |> b |> c` vs `b a |> c`
-        , forbid rightPizzaPipelines
-            |> that haveASimpleInputStep
-            |> andTryToFixThemBy eliminatingInputStep
-            |> andCallThem "|> pipeline with simple input"
-
         -- <| should never have an unnecessary input like `a <| b <| c` vs `a <| b c`
-        , forbid leftPizzaPipelines
-            |> that haveASimpleInputStep
-            |> andTryToFixThemBy eliminatingInputStep
-            |> andCallThem "<| pipeline with simple input"
+        , PremadePipelineRule.noPipelinesWithSimpleInputs
 
         -- <| should never appear in the middle of a pipeline unless it is separated clearly
-        , forbid leftPizzaPipelines
-            |> that (haveAParentNotSeparatedBy [ aLambdaFunction, aFlowControlStructure, aDataStructure, aLetBlock ])
-            |> andCallThem "<| pipeline with immediate parent"
+        , [ forbid leftPizzaPipelines
+                |> that (haveAParentNotSeparatedBy [ aLambdaFunction, aFlowControlStructure, aDataStructure, aLetBlock ])
+                |> andCallThem "<| pipeline with immediate parent"
+          ]
 
         -- Parenthetical application should never be nested more than once
-        , forbid parentheticalApplicationPipelines
-            |> that (haveMoreStepsThan 1)
-            |> andTryToFixThemBy convertingToRightPizza
-            |> andCallThem "parenthetical application with several steps"
+        , PremadePipelineRule.noRepeatedParentheticalApplication
+
+        -- Forbid use of non-commutative functions like `(++)`
+        , PremadePipelineRule.noPipelinesWithConfusingNonCommutativeFunctions
+
+        -- Forbid use of semantically "infix" functions like `Maybe.andThen` in left pipelines
+        , PremadePipelineRule.noSemanticallyInfixFunctionsInLeftPipelines
         ]
+        |> ReviewPipelineStyles.rule
 
     -- Detect simplifiable expressions, e.g. `a == True` can be simplified to `a`
     , Simplify.rule Simplify.defaults
