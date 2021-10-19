@@ -48,9 +48,7 @@ import NoUnused.Variables
 import NoUnusedPorts
 import NoUselessSubscriptions
 import Review.Rule as Rule exposing (Rule)
-import ReviewPipelineStyles exposing (andCallThem, andTryToFixThemBy, exceptThoseThat, forbid, leftPizzaPipelines, rightCompositionPipelines, rightPizzaPipelines, that)
-import ReviewPipelineStyles.Fixes exposing (convertingToLeftComposition, convertingToLeftPizza)
-import ReviewPipelineStyles.Predicates exposing (aDataStructure, aFlowControlStructure, aLambdaFunction, aLetBlock, aSemanticallyInfixFunction, aSimpleStep, and, haveAParentNotSeparatedBy, haveASecondStepThatIs, haveFewerStepsThan, haveStepsThatAreAll)
+import ReviewPipelineStyles
 import ReviewPipelineStyles.Premade as PremadePipelineRule
 import Simplify
 import UseCamelCase
@@ -250,28 +248,6 @@ config =
         -- << should not be multiline
         , PremadePipelineRule.noMultilineLeftComposition
 
-        -- >> should never be one simple step
-        , [ forbid rightCompositionPipelines
-                |> that
-                    (haveFewerStepsThan 2
-                        |> and (haveStepsThatAreAll aSimpleStep)
-                    )
-                |> exceptThoseThat (haveASecondStepThatIs aSemanticallyInfixFunction)
-                |> andTryToFixThemBy convertingToLeftComposition
-                |> andCallThem ">> pipeline with only 1 step"
-          ]
-
-        -- |> should never be one simple step
-        , [ forbid rightPizzaPipelines
-                |> that
-                    (haveFewerStepsThan 2
-                        |> and (haveStepsThatAreAll aSimpleStep)
-                    )
-                |> exceptThoseThat (haveASecondStepThatIs aSemanticallyInfixFunction)
-                |> andTryToFixThemBy convertingToLeftPizza
-                |> andCallThem "|> pipeline with only 1 step"
-          ]
-
         -- >> should only be multiline
         , PremadePipelineRule.noSingleLineRightComposition
 
@@ -281,12 +257,6 @@ config =
         -- |> should never have an input like `a |> b |> c` vs `b a |> c`
         -- <| should never have an unnecessary input like `a <| b <| c` vs `a <| b c`
         , PremadePipelineRule.noPipelinesWithSimpleInputs
-
-        -- <| should never appear in the middle of a pipeline unless it is separated clearly
-        , [ forbid leftPizzaPipelines
-                |> that (haveAParentNotSeparatedBy [ aLambdaFunction, aFlowControlStructure, aDataStructure, aLetBlock ])
-                |> andCallThem "<| pipeline with immediate parent"
-          ]
 
         -- Parenthetical application should never be nested more than once
         , PremadePipelineRule.noRepeatedParentheticalApplication
