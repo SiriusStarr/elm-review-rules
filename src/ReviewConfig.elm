@@ -8,6 +8,7 @@ import Docs.UpToDateReadmeLinks
 import NoBooleanCase
 import NoDebug.Log
 import NoDebug.TodoOrToString
+import NoDeprecated
 import NoDuplicatePorts
 import NoEmptyText
 import NoExposingEverything
@@ -85,6 +86,9 @@ config =
 
     -- Forbid `Debug.todo` and `Debug.toString`
     , NoDebug.TodoOrToString.rule
+
+    -- Forbid use of deprecated functions
+    , NoDeprecated.rule NoDeprecated.defaults
 
     -- Ensure port names are unique within a project
     , NoDuplicatePorts.rule
