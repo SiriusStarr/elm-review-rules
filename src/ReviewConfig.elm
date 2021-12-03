@@ -149,6 +149,7 @@ config =
 
     -- Forbid not exposing the type for any types that appear in exported functions or values
     , NoMissingTypeExpose.rule
+        |> Rule.ignoreErrorsForFiles [ "src/Main.elm" ]
 
     -- Disallow qualified use of names imported unqualified
     , NoModuleOnExposedNames.rule
