@@ -25,12 +25,12 @@ import NoMissingTypeConstructor
 import NoMissingTypeExpose
 import NoModuleOnExposedNames
 import NoPrematureLetComputation
+import NoRecordAliasConstructor
 import NoRecursiveUpdate
 import NoRedundantConcat
 import NoRedundantCons
 import NoSimpleLetBody
 import NoSinglePatternCase
-import NoTypeAliasConstructorCall
 import NoUnmatchedUnit
 import NoUnoptimizedRecursion
 import NoUnsafePorts
@@ -171,8 +171,8 @@ config =
     -- Forbid unnecessary/overly verbose `case` blocks
     , NoSinglePatternCase.rule NoSinglePatternCase.fixInArgument
 
-    -- Forbid use of type alias constructors except with Json.Decode.map
-    , NoTypeAliasConstructorCall.rule
+    -- Forbid all use of type alias constructors
+    , NoRecordAliasConstructor.rule
 
     -- Disallow matching `()` with `_`
     , NoUnmatchedUnit.rule
