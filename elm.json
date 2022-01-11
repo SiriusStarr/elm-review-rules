@@ -34,7 +34,8 @@
             "truqu/elm-review-nobooleancase": "1.0.0",
             "truqu/elm-review-noleftpizza": "2.0.0",
             "truqu/elm-review-noredundantconcat": "1.0.0",
-            "truqu/elm-review-noredundantcons": "1.0.0"
+            "truqu/elm-review-noredundantcons": "1.0.0",
+            "vkfisher/elm-review-no-unsafe-division": "1.0.0"
         },
         "indirect": {
             "Chadtech/elm-bool-extra": "2.4.2",
@@ -51,7 +52,7 @@
             "elm-community/dict-extra": "2.4.0",
             "elm-community/graph": "6.0.0",
             "elm-community/intdict": "3.0.0",
-            "elm-community/list-extra": "8.5.1",
+            "elm-community/list-extra": "8.5.2",
             "elm-community/maybe-extra": "5.3.0",
             "elm-community/result-extra": "2.4.0",
             "elm-community/string-extra": "4.0.1",

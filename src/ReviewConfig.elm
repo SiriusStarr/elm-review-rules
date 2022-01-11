@@ -33,6 +33,7 @@ import NoSimpleLetBody
 import NoSinglePatternCase
 import NoUnmatchedUnit
 import NoUnoptimizedRecursion
+import NoUnsafeDivision
 import NoUnsafePorts
 import NoUnsortedCases
 import NoUnsortedLetDeclarations
@@ -177,6 +178,9 @@ config =
 
     -- Disallow matching `()` with `_`
     , NoUnmatchedUnit.rule
+
+    -- Disallow division that could crash or create unexpected results, e.g. 1 / 0
+    , NoUnsafeDivision.rule
 
     -- Disallow ports that do not use JSON (preventing run-time errors)
     , NoUnsafePorts.rule NoUnsafePorts.any
