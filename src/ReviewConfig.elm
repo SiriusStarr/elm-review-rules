@@ -236,6 +236,9 @@ config =
     -- Enforce ordering of record fields
     , NoUnsortedRecords.rule
         (NoUnsortedRecords.defaults
+            |> NoUnsortedRecords.treatAllSubrecordsAsCanonical
+            -- This is only on to help me find bugs
+            |> NoUnsortedRecords.typecheckAllRecords
             |> NoUnsortedRecords.reportAmbiguousRecordsWithoutFix
         )
 
