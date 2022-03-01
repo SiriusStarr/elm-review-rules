@@ -25,6 +25,7 @@ import NoMissingTypeConstructor
 import NoMissingTypeExpose
 import NoModuleOnExposedNames
 import NoPrematureLetComputation
+import NoPrimitiveTypeAlias
 import NoRecordAliasConstructor
 import NoRecursiveUpdate
 import NoRedundantConcat
@@ -157,6 +158,9 @@ config =
 
     -- Forbid let declarations that are computed earlier than needed
     , NoPrematureLetComputation.rule
+
+    -- Forbid `type alias Days = Int` instead of `type Days = Days Int`
+    , NoPrimitiveTypeAlias.rule
 
     -- Forbid calling `update` within `update`
     , NoRecursiveUpdate.rule
