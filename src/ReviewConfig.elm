@@ -55,6 +55,7 @@ import ReviewPipelineStyles
 import ReviewPipelineStyles.Premade as PremadePipelineRule
 import Simplify
 import UseCamelCase
+import UseMemoizedLazyLambda
 
 
 {-| `elm-review` config
@@ -290,4 +291,7 @@ config =
 
     -- Enforce naming in camelCase and PascalCase
     , UseCamelCase.rule UseCamelCase.default
+
+    -- Enforce a constrained use of `Html.lazy` to ensure it actually is memoized properly
+    , UseMemoizedLazyLambda.rule
     ]

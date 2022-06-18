@@ -27,6 +27,7 @@
             "lue-bird/elm-review-record-alias-constructor": "1.1.0",
             "lxierita/no-typealias-constructor-call": "1.0.1",
             "mthadley/elm-review-unit": "2.0.1",
+            "noredink/elm-review-html-lazy": "1.0.0",
             "r-k-b/no-float-ids": "1.0.1",
             "r-k-b/no-long-import-lines": "1.0.4",
             "sparksp/elm-review-camelcase": "1.1.0",
