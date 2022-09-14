@@ -6,6 +6,7 @@ import Docs.ReviewAtDocs
 import Docs.ReviewLinksAndSections
 import Docs.UpToDateReadmeLinks
 import NoBooleanCase
+import NoConfusingPrefixOperator
 import NoDebug.Log
 import NoDebug.TodoOrToString
 import NoDeprecated
@@ -33,6 +34,7 @@ import NoRedundantCons
 import NoSimpleLetBody
 import NoSinglePatternCase
 import NoUnmatchedUnit
+import NoUnnecessaryTrailingUnderscore
 import NoUnoptimizedRecursion
 import NoUnsafeDivision
 import NoUnsafePorts
@@ -83,6 +85,9 @@ config =
 
     -- Disallow pattern matching on boolean values.
     , NoBooleanCase.rule
+
+    -- Forbid `(-) 1` and `(++) xs` and the like (non-commutative operators)
+    , NoConfusingPrefixOperator.rule
 
     -- Forbid `Debug.log`
     , NoDebug.Log.rule
@@ -183,6 +188,9 @@ config =
 
     -- Disallow matching `()` with `_`
     , NoUnmatchedUnit.rule
+
+    -- Disallow `\p_ ->` if there is no `p` in scope
+    , NoUnnecessaryTrailingUnderscore.rule
 
     -- Disallow division that could crash or create unexpected results, e.g. 1 / 0
     , NoUnsafeDivision.rule
