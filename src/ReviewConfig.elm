@@ -181,7 +181,9 @@ config =
     , NoSimpleLetBody.rule
 
     -- Forbid unnecessary/overly verbose `case` blocks
-    , NoSinglePatternCase.rule NoSinglePatternCase.fixInArgument
+    , NoSinglePatternCase.fixInArgument
+        |> NoSinglePatternCase.replaceUnusedBindings
+        |> NoSinglePatternCase.rule
 
     -- Forbid all use of type alias constructors
     , NoRecordAliasConstructor.rule

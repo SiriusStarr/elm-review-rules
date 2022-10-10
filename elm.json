@@ -7,7 +7,7 @@
     "dependencies": {
         "direct": {
             "Arkham/elm-review-no-missing-type-constructor": "1.0.2",
-            "SiriusStarr/elm-review-no-single-pattern-case": "2.0.1",
+            "SiriusStarr/elm-review-no-single-pattern-case": "2.1.0",
             "SiriusStarr/elm-review-no-unsorted": "1.1.2",
             "SiriusStarr/elm-review-pipeline-styles": "1.3.3",
             "dillonkearns/elm-review-no-primitive-type-alias": "1.0.0",
