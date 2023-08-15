@@ -46,7 +46,6 @@ import NoUnused.CustomTypeConstructorArgs
 import NoUnused.CustomTypeConstructors
 import NoUnused.Dependencies
 import NoUnused.Exports
-import NoUnused.Modules
 import NoUnused.Parameters
 import NoUnused.Patterns
 import NoUnused.Variables
@@ -213,11 +212,8 @@ config =
     -- Report unused dependencies
     , NoUnused.Dependencies.rule
 
-    -- Report exports never used in other modules
+    -- Report exports and modules never used in other modules
     , NoUnused.Exports.rule
-
-    -- Report modules never used (or exported in the package)
-    , NoUnused.Modules.rule
 
     -- Report unused function parameters
     , NoUnused.Parameters.rule
