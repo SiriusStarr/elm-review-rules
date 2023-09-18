@@ -20,7 +20,7 @@
             "jfmengels/elm-review-debug": "1.0.8",
             "jfmengels/elm-review-documentation": "2.0.4",
             "jfmengels/elm-review-performance": "1.0.2",
-            "jfmengels/elm-review-simplify": "2.1.0",
+            "jfmengels/elm-review-simplify": "2.1.1",
             "jfmengels/elm-review-the-elm-architecture": "1.0.3",
             "jfmengels/elm-review-unused": "1.2.0",
             "leojpod/review-no-empty-html-text": "1.0.2",
@@ -63,7 +63,7 @@
             "miniBill/elm-unicode": "1.0.3",
             "pzp1997/assoc-list": "1.0.0",
             "rtfeldman/elm-hex": "1.0.0",
-            "stil4m/elm-syntax": "7.3.1",
+            "stil4m/elm-syntax": "7.3.2",
             "stil4m/structured-writer": "1.0.3",
             "the-sett/elm-pretty-printer": "3.0.0",
             "the-sett/elm-syntax-dsl": "6.0.2"
