@@ -6,6 +6,7 @@ import Docs.ReviewAtDocs
 import Docs.ReviewLinksAndSections
 import Docs.UpToDateReadmeLinks
 import NoBooleanCase
+import NoBrokenParserFunctions
 import NoConfusingPrefixOperator
 import NoDebug.Log
 import NoDebug.TodoOrToString
@@ -84,6 +85,9 @@ config =
 
     -- Disallow pattern matching on boolean values.
     , NoBooleanCase.rule
+
+    -- Disallow usage of parser functions that are broken and will be fixed...well, never, because it's core Elm
+    , NoBrokenParserFunctions.rule
 
     -- Forbid `(-) 1` and `(++) xs` and the like (non-commutative operators)
     , NoConfusingPrefixOperator.rule
