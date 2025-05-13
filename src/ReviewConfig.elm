@@ -32,6 +32,7 @@ import NoRecordAliasConstructor
 import NoRecursiveUpdate
 import NoRedundantConcat
 import NoRedundantCons
+import NoRedundantlyQualifiedType
 import NoSimpleLetBody
 import NoSinglePatternCase
 import NoUnmatchedUnit
@@ -179,6 +180,9 @@ config =
 
     -- Forbids consing to a literal list, e.g. `foo::[bar]` instead of `[foo,bar]`
     , NoRedundantCons.rule
+
+    -- Forbid `Set.Set` and the like
+    , NoRedundantlyQualifiedType.rule
 
     -- Forbid `let a = 5 in`
     , NoSimpleLetBody.rule
